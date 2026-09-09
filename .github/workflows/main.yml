@@ -11,7 +11,7 @@ jobs:
       - name: Baixar projeto
         uses: actions/checkout@v4
 
-      - name: Encontrar e extrair projeto
+      - name: Extrair projeto
         run: |
           mkdir projeto
           unzip -q Libris_Geracao_Android_Studio.zip -d projeto
@@ -22,11 +22,16 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
       - name: Gerar APK
-        working-directory: projeto
         run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          PROJECT_DIR=$(dirname "$(find projeto -type f \( -name settings.gradle -o -name settings.gradle.kts \) | head -n 1)")
+          cd "$PROJECT_DIR"
+          gradle assembleDebug
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
