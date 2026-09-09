@@ -1,0 +1,35 @@
+name: Gerar APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar projeto
+        uses: actions/checkout@v4
+
+      - name: Encontrar e extrair projeto
+        run: |
+          mkdir projeto
+          unzip -q Libris_Geracao_Android_Studio.zip -d projeto
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Gerar APK
+        working-directory: projeto
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Disponibilizar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Libris-Geracao-APK
+          path: projeto/**/build/outputs/apk/**/*.apk
